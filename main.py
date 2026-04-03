@@ -15,7 +15,7 @@ from trainer import train
 from evaluator import confusion_matrix, overall_accuracy
 
 # ---------------------------------------------------------------------------
-DATA_PATH = "data/penguins.csv"
+DATA_PATH = "data/penguins_preprocessed.csv"
 N_FEATURES = 5
 N_CLASSES = 3
 # ---------------------------------------------------------------------------

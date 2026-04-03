@@ -3,37 +3,16 @@ import csv
 
 
 def load_data(filepath, num_classes=3, samples_per_class=50, train_per_class=30):
-    # CSV columns: Species, CulmenLength, CulmenDepth, FlipperLength, OriginLocation, BodyMass
-    # Species      → class label (string → int)
-    # OriginLocation → categorical feature (string → int)
-    # Rows with any NA value are skipped
-
-    SPECIES_MAP = {"Adelie": 0, "Chinstrap": 1, "Gentoo": 2}
-    LOCATION_MAP = {"Torgersen": 0, "Dream": 1, "Biscoe": 2}
-
+    species_to_class = {'Adelie': 0, 'Chinstrap': 1, 'Gentoo': 2}
     data_by_class = {i: [] for i in range(num_classes)}
 
-    with open(filepath, newline="") as f:
+    with open(filepath, newline='') as f:
         reader = csv.reader(f)
         next(reader)  # skip header
         for row in reader:
-            if any(v.strip().upper() == "NA" for v in row):
-                continue  # skip rows with missing values
-
             species = row[0].strip()
-            location = row[4].strip()
-
-            if species not in SPECIES_MAP or location not in LOCATION_MAP:
-                continue  # skip unrecognised values
-
-            label = SPECIES_MAP[species]
-            features = [
-                float(row[1]),  # CulmenLength
-                float(row[2]),  # CulmenDepth
-                float(row[3]),  # FlipperLength
-                float(LOCATION_MAP[location]),  # OriginLocation (encoded)
-                float(row[5]),  # BodyMass
-            ]
+            features = list(map(float, row[1:6]))   # columns 1–5 are the features
+            label = species_to_class[species]
             data_by_class[label].append(features)
 
     X_train_parts, y_train_parts = [], []
