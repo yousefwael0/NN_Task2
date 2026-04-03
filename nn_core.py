@@ -1,15 +1,39 @@
 import numpy as np
 import csv
 
+
 def load_data(filepath, num_classes=3, samples_per_class=50, train_per_class=30):
+    # CSV columns: Species, CulmenLength, CulmenDepth, FlipperLength, OriginLocation, BodyMass
+    # Species      → class label (string → int)
+    # OriginLocation → categorical feature (string → int)
+    # Rows with any NA value are skipped
+
+    SPECIES_MAP = {"Adelie": 0, "Chinstrap": 1, "Gentoo": 2}
+    LOCATION_MAP = {"Torgersen": 0, "Dream": 1, "Biscoe": 2}
+
     data_by_class = {i: [] for i in range(num_classes)}
 
-    with open(filepath, newline='') as f:
+    with open(filepath, newline="") as f:
         reader = csv.reader(f)
-        next(reader)
+        next(reader)  # skip header
         for row in reader:
-            features = list(map(float, row[:5]))
-            label = int(row[5])
+            if any(v.strip().upper() == "NA" for v in row):
+                continue  # skip rows with missing values
+
+            species = row[0].strip()
+            location = row[4].strip()
+
+            if species not in SPECIES_MAP or location not in LOCATION_MAP:
+                continue  # skip unrecognised values
+
+            label = SPECIES_MAP[species]
+            features = [
+                float(row[1]),  # CulmenLength
+                float(row[2]),  # CulmenDepth
+                float(row[3]),  # FlipperLength
+                float(LOCATION_MAP[location]),  # OriginLocation (encoded)
+                float(row[5]),  # BodyMass
+            ]
             data_by_class[label].append(features)
 
     X_train_parts, y_train_parts = [], []
@@ -24,10 +48,18 @@ def load_data(filepath, num_classes=3, samples_per_class=50, train_per_class=30)
 
     X_train = np.vstack(X_train_parts)
     X_test = np.vstack(X_test_parts)
+
+    # Z-score normalise using train statistics only (applied to both sets)
+    mean = X_train.mean(axis=0)
+    std = X_train.std(axis=0) + 1e-8  # avoid division by zero
+    X_train = (X_train - mean) / std
+    X_test = (X_test - mean) / std
+
     y_train = one_hot(np.concatenate(y_train_parts), num_classes)
     y_test = one_hot(np.concatenate(y_test_parts), num_classes)
 
     return X_train, y_train, X_test, y_test
+
 
 def one_hot(labels, num_classes):
     n = len(labels)
@@ -36,33 +68,39 @@ def one_hot(labels, num_classes):
         encoded[i, int(label)] = 1.0
     return encoded
 
+
 def init_weights(layer_sizes, use_bias):
     weights, biases = [], []
     for i in range(len(layer_sizes) - 1):
-        w = np.random.randn(layer_sizes[i], layer_sizes[i+1]) * 0.01
+        # Xavier init: keeps signal variance stable across layers
+        scale = np.sqrt(2.0 / (layer_sizes[i] + layer_sizes[i + 1]))
+        w = np.random.randn(layer_sizes[i], layer_sizes[i + 1]) * scale
         if use_bias:
-            b = np.random.randn(1, layer_sizes[i+1]) * 0.01
+            b = np.random.randn(1, layer_sizes[i + 1]) * scale
         else:
-            b = np.zeros((1, layer_sizes[i+1]))
+            b = np.zeros((1, layer_sizes[i + 1]))
         weights.append(w)
         biases.append(b)
     return weights, biases
 
+
 def activation(z, func):
-    if func == 'sigmoid':
+    if func == "sigmoid":
         return 1.0 / (1.0 + np.exp(-np.clip(z, -500, 500)))
-    elif func == 'tanh':
+    elif func == "tanh":
         return np.tanh(z)
     else:
         raise ValueError
 
+
 def activation_derivative(a, func):
-    if func == 'sigmoid':
+    if func == "sigmoid":
         return a * (1.0 - a)
-    elif func == 'tanh':
-        return 1.0 - a ** 2
+    elif func == "tanh":
+        return 1.0 - a**2
     else:
         raise ValueError
+
 
 def forward_pass(x, weights, biases, func):
     x = x.reshape(1, -1)
@@ -74,6 +112,7 @@ def forward_pass(x, weights, biases, func):
         outputs.append(a)
     return nets, outputs
 
+
 def build_layer_sizes(n_features, hidden_layers, n_classes):
     return [n_features] + hidden_layers + [n_classes]
 
@@ -81,7 +120,7 @@ def build_layer_sizes(n_features, hidden_layers, n_classes):
 # ---------------------------------------------------------------------------
 # Quick self-test (run this file directly: python nn_core.py)
 # ---------------------------------------------------------------------------
-if __name__ == '__main__':
+if __name__ == "__main__":
     print("=== nn_core self-test ===")
 
     # Once TODOs are done, un-comment and run to verify shapes.
@@ -92,10 +131,10 @@ if __name__ == '__main__':
     print("Weight shapes:", [wi.shape for wi in w])
     #
     x_dummy = np.random.randn(1, 5)
-    nets, outs = forward_pass(x_dummy, w, b, func='sigmoid')
-    print("Output shape:", outs[-1].shape)   # should be (1, 3)
-    print("Output sum  :", outs[-1].sum())    # not softmax, so won't sum to 1
+    nets, outs = forward_pass(x_dummy, w, b, func="sigmoid")
+    print("Output shape:", outs[-1].shape)  # should be (1, 3)
+    print("Output sum  :", outs[-1].sum())  # not softmax, so won't sum to 1
     #
-    print("Sigmoid(0)  :", activation(np.array([[0.0]]), 'sigmoid'))  # → 0.5
-    print("Tanh(0)     :", activation(np.array([[0.0]]), 'tanh'))     # → 0.0
+    print("Sigmoid(0)  :", activation(np.array([[0.0]]), "sigmoid"))  # → 0.5
+    print("Tanh(0)     :", activation(np.array([[0.0]]), "tanh"))  # → 0.0
     print("Uncomment the self-test block above once TODOs are implemented.")
