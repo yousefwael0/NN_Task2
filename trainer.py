@@ -54,29 +54,3 @@ def train(X_train, y_train, weights, biases, config):
         accuracy_log.append(acc)
 
     return weights, biases, accuracy_log
-
-
-# ---------------------------------------------------------------------------
-# Quick self-test (run this file directly: python trainer.py)
-# ---------------------------------------------------------------------------
-if __name__ == "__main__":
-    print("=== trainer self-test (uses mock forward/activation) ===")
-
-    # Once TODOs are done, un-comment to verify the training loop runs.
-    #
-    np.random.seed(42)
-    from nn_core import init_weights, build_layer_sizes
-
-    layer_sizes = build_layer_sizes(5, [4], 3)
-    w, b = init_weights(layer_sizes, use_bias=True)
-
-    # Dummy data: 90 samples, 5 features, 3 classes
-    X_dummy = np.random.randn(90, 5)
-    y_dummy = np.eye(3)[np.repeat([0, 1, 2], 30)]  # 30 per class, one-hot
-    #
-    cfg = {"eta": 0.01, "epochs": 50, "activation": "sigmoid", "use_bias": True}
-    w_trained, b_trained, log = train(X_dummy, y_dummy, w, b, cfg)
-    print(f"Final train accuracy: {log[-1]:.1f}%")
-    print(f"Accuracy log (every 5 epochs): {log[::5]}")
-
-    print("Uncomment the self-test block above once TODOs are implemented.")

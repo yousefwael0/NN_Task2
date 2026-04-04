@@ -8,10 +8,10 @@ def load_data(filepath, num_classes=3, samples_per_class=50, train_per_class=30)
 
     with open(filepath, newline='') as f:
         reader = csv.reader(f)
-        next(reader)  # skip header
+        next(reader)
         for row in reader:
             species = row[0].strip()
-            features = list(map(float, row[1:6]))   # columns 1–5 are the features
+            features = list(map(float, row[1:6]))
             label = species_to_class[species]
             data_by_class[label].append(features)
 
@@ -51,7 +51,6 @@ def one_hot(labels, num_classes):
 def init_weights(layer_sizes, use_bias):
     weights, biases = [], []
     for i in range(len(layer_sizes) - 1):
-        # Xavier init: keeps signal variance stable across layers
         scale = np.sqrt(2.0 / (layer_sizes[i] + layer_sizes[i + 1]))
         w = np.random.randn(layer_sizes[i], layer_sizes[i + 1]) * scale
         if use_bias:
@@ -94,26 +93,3 @@ def forward_pass(x, weights, biases, func):
 
 def build_layer_sizes(n_features, hidden_layers, n_classes):
     return [n_features] + hidden_layers + [n_classes]
-
-
-# ---------------------------------------------------------------------------
-# Quick self-test (run this file directly: python nn_core.py)
-# ---------------------------------------------------------------------------
-if __name__ == "__main__":
-    print("=== nn_core self-test ===")
-
-    # Once TODOs are done, un-comment and run to verify shapes.
-    #
-    layer_sizes = build_layer_sizes(5, [4, 4], 3)
-    w, b = init_weights(layer_sizes, use_bias=True)
-    print("Layer sizes:", layer_sizes)
-    print("Weight shapes:", [wi.shape for wi in w])
-    #
-    x_dummy = np.random.randn(1, 5)
-    nets, outs = forward_pass(x_dummy, w, b, func="sigmoid")
-    print("Output shape:", outs[-1].shape)  # should be (1, 3)
-    print("Output sum  :", outs[-1].sum())  # not softmax, so won't sum to 1
-    #
-    print("Sigmoid(0)  :", activation(np.array([[0.0]]), "sigmoid"))  # → 0.5
-    print("Tanh(0)     :", activation(np.array([[0.0]]), "tanh"))  # → 0.0
-    print("Uncomment the self-test block above once TODOs are implemented.")

@@ -36,34 +36,3 @@ def print_results(matrix, train_accuracy, test_accuracy, config):
     print(f"\n  Train Accuracy : {train_accuracy:.1f}%")
     print(f"  Test  Accuracy : {test_accuracy:.1f}%")
     print(f"\n  Config: {config}")
-
-
-# ---------------------------------------------------------------------------
-# Quick self-test (run this file directly: python evaluator.py)
-# ---------------------------------------------------------------------------
-if __name__ == "__main__":
-    print("=== evaluator self-test (uses mock forward pass) ===")
-
-    # Once TODOs are done, un-comment to verify shapes and output.
-    #
-    np.random.seed(0)
-    # # Fake weights for a 5→4→3 network
-    w = [np.random.randn(5, 4) * 0.1, np.random.randn(4, 3) * 0.1]
-    b = [np.zeros((1, 4)), np.zeros((1, 3))]
-    #
-    # # 60 test samples (20 per class), 5 features
-    X_test = np.random.randn(60, 5)
-    y_test = np.eye(3)[np.repeat([0, 1, 2], 20)]
-    #
-    mat = confusion_matrix(X_test, y_test, w, b, func="sigmoid")
-    acc = overall_accuracy(mat)
-    cfg = {
-        "eta": 0.01,
-        "epochs": 100,
-        "activation": "sigmoid",
-        "use_bias": False,
-        "hidden_layers": [4],
-    }
-    print_results(mat, train_accuracy=65.0, test_accuracy=acc, config=cfg)
-
-    print("Uncomment the self-test block above once TODOs are implemented.")
