@@ -14,7 +14,7 @@ def load_data(filepath, num_classes=3, samples_per_class=50, train_per_class=30)
         next(reader)  # skip header
         for row in reader:
             species = row[0].strip()
-            features = [float(value) for value in row[1:6]]
+            features = [float(value) for value in row[1:]]
             class_id = SPECIES_TO_CLASS[species]
             samples_by_class[class_id].append(features)
 
