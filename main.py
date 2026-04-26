@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-
+import numpy as np
 from nn_core import load_data, init_weights, build_layer_sizes
 from trainer import train
 from evaluator import confusion_matrix, overall_accuracy
@@ -9,6 +9,7 @@ DATA_PATH = "data/penguins_preprocessed.csv"
 N_FEATURES = 5
 N_CLASSES = 3
 CLASS_LABELS = ["Adelie", "Chinstrap", "Gentoo"]
+np.random.seed(42)
 
 
 def build_report_row(

@@ -2,6 +2,8 @@ import numpy as np
 
 from nn_core import forward_pass, activation_derivative
 
+np.random.seed(42)
+
 
 def backward_pass(target, outputs, weights, func):
     """Compute layer-wise delta terms for backpropagation."""

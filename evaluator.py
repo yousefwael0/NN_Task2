@@ -2,6 +2,8 @@ import numpy as np
 
 from nn_core import forward_pass
 
+np.random.seed(42)
+
 
 def classify(x, weights, biases, func):
     """Predict class index and one-hot vector for a single sample."""

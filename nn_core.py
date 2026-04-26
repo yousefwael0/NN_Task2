@@ -2,6 +2,7 @@ import csv
 
 import numpy as np
 
+np.random.seed(42)
 SPECIES_TO_CLASS = {"Adelie": 0, "Chinstrap": 1, "Gentoo": 2}
 
 
@@ -58,7 +59,9 @@ def init_weights(layer_sizes, use_bias):
         scale = np.sqrt(2.0 / (in_size + out_size))
         weight_matrix = np.random.randn(in_size, out_size) * scale
         bias_vector = (
-            np.random.randn(1, out_size) * scale if use_bias else np.zeros((1, out_size))
+            np.random.randn(1, out_size) * scale
+            if use_bias
+            else np.zeros((1, out_size))
         )
         weights.append(weight_matrix)
         biases.append(bias_vector)
