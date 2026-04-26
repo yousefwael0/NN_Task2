@@ -20,11 +20,11 @@ def backward_pass(target, outputs, weights, func):
     return deltas
 
 
-def update_weights(weights, biases, deltas, outputs, eta, use_bias):
+def update_weights(weights, biases, deltas, outputs, learning_rate, use_bias):
     for layer_idx in range(len(weights)):
-        weights[layer_idx] += eta * outputs[layer_idx].T @ deltas[layer_idx]
+        weights[layer_idx] += learning_rate * outputs[layer_idx].T @ deltas[layer_idx]
         if use_bias:
-            biases[layer_idx] += eta * deltas[layer_idx]
+            biases[layer_idx] += learning_rate * deltas[layer_idx]
     return weights, biases
 
 
@@ -42,7 +42,7 @@ def training_accuracy(X_train, y_train, weights, biases, func):
 
 
 def train(X_train, y_train, weights, biases, config):
-    eta = config["eta"]
+    learning_rate = config["learning_rate"]
     epochs = config["epochs"]
     func = config["activation"]
     use_bias = config["use_bias"]
@@ -57,7 +57,7 @@ def train(X_train, y_train, weights, biases, config):
             _, outputs = forward_pass(x, weights, biases, func)
             deltas = backward_pass(target, outputs, weights, func)
             weights, biases = update_weights(
-                weights, biases, deltas, outputs, eta, use_bias
+                weights, biases, deltas, outputs, learning_rate, use_bias
             )
 
         epoch_accuracy = training_accuracy(X_train, y_train, weights, biases, func)

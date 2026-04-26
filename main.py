@@ -12,7 +12,14 @@ CLASS_LABELS = ["Adelie", "Chinstrap", "Gentoo"]
 
 
 def build_report_row(
-    activation, train_acc, test_acc, eta, epochs, n_hidden, hidden_nodes, use_bias
+    activation,
+    train_acc,
+    test_acc,
+    learning_rate,
+    epochs,
+    n_hidden,
+    hidden_nodes,
+    use_bias,
 ):
     return pd.DataFrame(
         [
@@ -20,7 +27,7 @@ def build_report_row(
                 "Activation Function": activation.capitalize(),
                 "Training Accuracy": f"{train_acc:.1f}%",
                 "Testing Accuracy": f"{test_acc:.1f}%",
-                "Learning Rate": eta,
+                "Learning Rate": learning_rate,
                 "Epoch Count": int(epochs),
                 "Hidden Layer Count": int(n_hidden),
                 "Neurons per Hidden Layer": str(hidden_nodes),
@@ -28,6 +35,7 @@ def build_report_row(
             }
         ]
     )
+
 
 st.set_page_config(page_title="Penguin Species Classifier", layout="wide")
 st.title("🐧 Penguin Species Classifier")
@@ -52,7 +60,7 @@ with st.sidebar:
         )
         neurons_per_layer.append(int(n))
 
-    eta = st.number_input(
+    learning_rate = st.number_input(
         "Learning rate",
         min_value=0.0001,
         max_value=1.0,
@@ -70,9 +78,7 @@ with st.sidebar:
     activation = st.radio(
         "Activation",
         options=["sigmoid", "tanh"],
-        format_func=lambda x: (
-            "Sigmoid" if x == "sigmoid" else "Tanh"
-        ),
+        format_func=lambda x: ("Sigmoid" if x == "sigmoid" else "Tanh"),
     )
 
     run_btn = st.button("Train Model", type="primary", use_container_width=True)
@@ -82,7 +88,7 @@ if not run_btn:
     st.stop()
 
 config = {
-    "eta": float(eta),
+    "learning_rate": float(learning_rate),
     "epochs": int(epochs),
     "activation": activation,
     "use_bias": use_bias,
@@ -134,7 +140,7 @@ report_row = build_report_row(
     activation,
     train_acc,
     test_acc,
-    eta,
+    learning_rate,
     epochs,
     n_hidden,
     neurons_per_layer,
